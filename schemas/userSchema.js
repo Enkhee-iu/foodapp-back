@@ -1,39 +1,46 @@
+
+
 const { Schema, model } = require("mongoose");
+const UserRoleEnum = require("../utils/userRole");  
 
 const UserSchema = new Schema(
   {
     firstName: {
       type: String,
-      required: [true, "First name is required"],
-      minLength: [2, "First name must be at least 2 characters"],
-      maxLength: [50, "First name must be less than 50 characters"],
+      required: [true, "Нэр заавал оруулна уу"],
+      minLength: [2, "Нэр дор хаяж 2 үсэгтэй байх ёстой"],
+      maxLength: [50, "Нэр 50 үсгээс ихгүй байх ёстой"],
+      trim: true,
     },
 
     email: {
       type: String,
-      required: [true, "Email is required"],
+      required: [true, "Имэйл заавал оруулна уу"],
       unique: true,
+      lowercase: true,
+      trim: true,
     },
 
     password: {
       type: String,
-      required: [true, "Password is required"],
+      required: [true, "Нууц үг заавал оруулна уу"],
+      minlength: 6,
     },
 
     phoneNumber: {
       type: String,
-      required: false,
+      trim: true,
     },
 
     address: {
       type: String,
-      required: false,
+      trim: true,
     },
 
     role: {
       type: String,
-      enum: ["USER", "ADMIN", "RESTAURANT", "DRIVER"],
-      default: "USER",
+      enum: Object.values(UserRoleEnum),    
+      default: UserRoleEnum.USER,           
     },
 
     isVerified: {
@@ -42,8 +49,12 @@ const UserSchema = new Schema(
     },
   },
   {
-    timestamps: true,
+    timestamps: true,   
   }
 );
+
+
+
+UserSchema.index({ role: 1 });
 
 module.exports = model("User", UserSchema);

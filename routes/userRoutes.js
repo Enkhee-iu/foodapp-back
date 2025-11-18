@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const createUser = require("../controllers/user/createUser");
-const getUsers = require("../controllers/user/getUsers");
+const getUsers = require("../controllers/user/getUser");
 const getSingleUser = require("../controllers/user/getSingleUser");
 const updateUser = require("../controllers/user/updateUser");
 const deleteUser = require("../controllers/user/deleteUser");
