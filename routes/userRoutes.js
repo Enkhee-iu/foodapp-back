@@ -1,26 +1,16 @@
 const express = require("express");
-const User = require("../schemas/userSchema");
+const router = express.Router();
+
 const createUser = require("../controllers/user/createUser");
+const getUsers = require("../controllers/user/getUsers");
+const getSingleUser = require("../controllers/user/getSingleUser");
+const updateUser = require("../controllers/user/updateUser");
+const deleteUser = require("../controllers/user/deleteUser");
 
-const userRouter = express.Router();
+router.get("/", getUsers);
+router.get("/:id", getSingleUser);
+router.post("/", createUser);
+router.put("/:id", updateUser);
+router.delete("/:id", deleteUser);
 
-userRouter.get("/", async (req, res) => {
-  const users = await User.find();
-  res.send(users);
-});
-
-userRouter.post("/", createUser);
-
-userRouter.put("/", (req, res) => {
-  res.send("hello PUT");
-});
-
-userRouter.patch("/", (req, res) => {
-  res.send("hello PATCH");
-});
-
-userRouter.delete("/", (req, res) => {
-  res.send("hello DELETE");
-});
-
-module.exports = userRouter;
+module.exports = router;
