@@ -3,12 +3,12 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 
-
 const signUp = async (req, res) => {
   try {
     const { firstName, email, password } = req.body;
-
+    console.log("first");
     const existed = await User.findOne({ email: email.toLowerCase() });
+    console.log("existed");
     if (existed) {
       return res.status(400).json({
         success: false,
@@ -24,17 +24,13 @@ const signUp = async (req, res) => {
       password: hashed,
     });
 
-    const accessToken = jwt.sign(
-      { _id: user._id },
-      process.env.JWT_SECRET,
-      { expiresIn: "15m" }
-    );
+    const accessToken = jwt.sign({ _id: user._id }, "Power", {
+      expiresIn: "15m",
+    });
 
-    const refreshToken = jwt.sign(
-      { _id: user._id },
-      process.env.REFRESH_SECRET,
-      { expiresIn: "7d" }
-    );
+    const refreshToken = jwt.sign({ _id: user._id }, "Power", {
+      expiresIn: "7d",
+    });
 
     res.status(201).json({
       success: true,
@@ -53,7 +49,6 @@ const signUp = async (req, res) => {
   }
 };
 
-
 const signIn = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -70,16 +65,16 @@ const signIn = async (req, res) => {
         .status(400)
         .json({ success: false, message: "Имэйл эсвэл нууц үг буруу" });
 
-    const accessToken = jwt.sign(
-      { _id: user._id },
-      process.env.JWT_SECRET,
-      { expiresIn: "15m" }
-    );
+    const accessToken = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "15m",
+    });
 
     const refreshToken = jwt.sign(
       { _id: user._id },
       process.env.REFRESH_SECRET,
-      { expiresIn: "7d" }
+      {
+        expiresIn: "7d",
+      }
     );
 
     res.json({
@@ -98,7 +93,6 @@ const signIn = async (req, res) => {
     res.status(500).json({ success: false, message: err.message });
   }
 };
-
 
 const refreshToken = async (req, res) => {
   try {
@@ -123,20 +117,21 @@ const refreshToken = async (req, res) => {
   }
 };
 
-
 const requestPasswordReset = async (req, res) => {
   try {
     const { email } = req.body;
     const user = await User.findOne({ email: email.toLowerCase() });
 
     if (!user) {
-      return res.status(400).json({ success: false, message: "Имэйл олдсонгүй" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Имэйл олдсонгүй" });
     }
 
     const resetToken = crypto.randomBytes(32).toString("hex");
 
     user.resetToken = resetToken;
-    user.resetTokenExpire = Date.now() + 1000 * 60 * 10; 
+    user.resetTokenExpire = Date.now() + 1000 * 60 * 10;
     await user.save();
 
     res.json({
@@ -171,7 +166,6 @@ const verifyResetToken = async (req, res) => {
   }
 };
 
-
 const resetPassword = async (req, res) => {
   try {
     const { token, newPassword } = req.body;
@@ -201,7 +195,6 @@ const resetPassword = async (req, res) => {
     res.status(500).json({ success: false, message: err.message });
   }
 };
-
 
 module.exports = {
   signUp,
