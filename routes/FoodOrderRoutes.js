@@ -1,17 +1,13 @@
-
-
 const express = require("express");
 const router = express.Router();
 const FoodOrder = require("../schemas/foodOrderSchema");
 
+// const requireAdmin = require("../middleware/requireAdmin");
+// const requireRestaurant = require("../middleware/requireRestaurant");
+// const requireDriver = require("../middleware/requireDriver");
+// const requireUser = require("../middleware/requireUser");
 
-const requireAdmin = require("../middleware/requireAdmin");
-const requireRestaurant = require("../middleware/requireRestaurant");
-const requireDriver = require("../middleware/requireDriver");
-const requireUser = require("../middleware/requireUser");  
-
-
-router.get("/", requireAdmin, async (req, res) => {
+router.get("/", async (req, res) => {
   try {
     const orders = await FoodOrder.find()
       .populate("user", "firstName email phoneNumber")
@@ -25,21 +21,25 @@ router.get("/", requireAdmin, async (req, res) => {
   }
 });
 
-
-router.get("/:id", requireUser, async (req, res) => {
+router.get("/:id", async (req, res) => {
   try {
     const order = await FoodOrder.findById(req.params.id)
       .populate("user", "firstName email")
       .populate("foodOrderItems.food", "name price image");
 
-    if (!order) return res.status(404).json({ success: false, message: "Захиалга олдсонгүй" });
+    if (!order)
+      return res
+        .status(404)
+        .json({ success: false, message: "Захиалга олдсонгүй" });
 
-    
     const isOwner = order.user._id.toString() === req.user._id.toString();
     const isAdmin = req.user.role === "admin";
 
     if (!isOwner && !isAdmin) {
-      return res.status(403).json({ success: false, message: "Танд энэ захиалгыг харах эрх байхгүй" });
+      return res.status(403).json({
+        success: false,
+        message: "Танд энэ захиалгыг харах эрх байхгүй",
+      });
     }
 
     res.json({ success: true, data: order });
@@ -48,10 +48,8 @@ router.get("/:id", requireUser, async (req, res) => {
   }
 });
 
-
-router.post("/", requireUser, async (req, res) => {
+router.post("/", async (req, res) => {
   try {
- 
     req.body.user = req.user._id;
 
     const order = await FoodOrder.create(req.body);
@@ -59,32 +57,38 @@ router.post("/", requireUser, async (req, res) => {
       .populate("user", "firstName email")
       .populate("foodOrderItems.food", "name price image");
 
-    res.status(201).json({ 
-      success: true, 
-      message: "Захиалга амжилттай үүслээ!", 
-      data: populated 
+    res.status(201).json({
+      success: true,
+      message: "Захиалга амжилттай үүслээ!",
+      data: populated,
     });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
 });
 
-
-router.patch("/:id/status", requireAdmin || requireDriver || requireRestaurant, async (req, res) => {
-  
-});
+router.patch("/:id/status", async (req, res) => {});
 
 router.patch("/:id/status", async (req, res) => {
   try {
     const { status } = req.body;
-    const validStatuses = ["pending", "confirmed", "preparing", "on_the_way", "delivered", "cancelled"];
+    const validStatuses = [
+      "pending",
+      "confirmed",
+      "preparing",
+      "on_the_way",
+      "delivered",
+      "cancelled",
+    ];
     if (!validStatuses.includes(status)) {
       return res.status(400).json({ success: false, message: "Буруу статус" });
     }
 
     const allowedRoles = ["admin", "restaurant", "driver"];
     if (!allowedRoles.includes(req.user.role)) {
-      return res.status(403).json({ success: false, message: "Танд статус өөрчлөх эрх байхгүй" });
+      return res
+        .status(403)
+        .json({ success: false, message: "Танд статус өөрчлөх эрх байхгүй" });
     }
 
     const order = await FoodOrder.findByIdAndUpdate(
@@ -95,19 +99,28 @@ router.patch("/:id/status", async (req, res) => {
       .populate("user", "firstName email")
       .populate("foodOrderItems.food", "name price image");
 
-    if (!order) return res.status(404).json({ success: false, message: "Захиалга олдсонгүй" });
+    if (!order)
+      return res
+        .status(404)
+        .json({ success: false, message: "Захиалга олдсонгүй" });
 
-    res.json({ success: true, message: "Статус амжилттай шинэчлэгдлээ", data: order });
+    res.json({
+      success: true,
+      message: "Статус амжилттай шинэчлэгдлээ",
+      data: order,
+    });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
 });
 
-
-router.delete("/:id", requireAdmin, async (req, res) => {
+router.delete("/:id", async (req, res) => {
   try {
     const order = await FoodOrder.findByIdAndDelete(req.params.id);
-    if (!order) return res.status(404).json({ success: false, message: "Захиалга олдсонгүй" });
+    if (!order)
+      return res
+        .status(404)
+        .json({ success: false, message: "Захиалга олдсонгүй" });
 
     res.json({ success: true, message: "Захиалга амжилттай устгагдлаа" });
   } catch (err) {

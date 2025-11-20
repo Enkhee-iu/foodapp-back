@@ -1,15 +1,13 @@
-
-
 const { Schema, model } = require("mongoose");
-const UserRoleEnum = require("../utils/userRole");  
+const UserRoleEnum = require("../utils/userRole");
 
 const UserSchema = new Schema(
   {
     firstName: {
       type: String,
-      required: [true, "Нэр заавал оруулна уу"],
-      minLength: [2, "Нэр дор хаяж 2 үсэгтэй байх ёстой"],
-      maxLength: [50, "Нэр 50 үсгээс ихгүй байх ёстой"],
+      default: "",
+      // minLength: [2, "Нэр дор хаяж 2 үсэгтэй байх ёстой"],
+      // maxLength: [50, "Нэр 50 үсгээс ихгүй байх ёстой"],
       trim: true,
     },
 
@@ -39,8 +37,8 @@ const UserSchema = new Schema(
 
     role: {
       type: String,
-      enum: Object.values(UserRoleEnum),    
-      default: UserRoleEnum.USER,           
+      enum: Object.values(UserRoleEnum),
+      default: UserRoleEnum.USER,
     },
 
     isVerified: {
@@ -49,11 +47,9 @@ const UserSchema = new Schema(
     },
   },
   {
-    timestamps: true,   
+    timestamps: true,
   }
 );
-
-
 
 UserSchema.index({ role: 1 });
 

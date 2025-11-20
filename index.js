@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const connectToDB = require("./db");
@@ -25,3 +26,6 @@ app.use("/api/auth", authRoutes);
 app.listen(PORT, () => {
   console.log("API listening on http://localhost:" + PORT);
 });
+
+console.log("JWT_SECRET=", process.env.JWT_SECRET);
+console.log("REFRESH_SECRET=", process.env.REFRESH_SECRET);

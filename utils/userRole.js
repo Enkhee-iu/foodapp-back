@@ -1,11 +1,4 @@
-
-
-const UserRoleEnum = {
-  USER: "user",
+module.exports = {
   ADMIN: "admin",
-  RESTAURANT: "restaurant",
-  DRIVER: "driver"
+  USER: "user",
 };
-
-Object.freeze(UserRoleEnum);
-module.exports = UserRoleEnum;
