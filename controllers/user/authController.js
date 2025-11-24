@@ -2,7 +2,6 @@ const User = require("../../schemas/userSchema");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
-// ---------------- STEP 1: CHECK EMAIL ----------------
 const checkEmail = async (req, res) => {
   try {
     const { email } = req.body;
@@ -16,7 +15,6 @@ const checkEmail = async (req, res) => {
       });
     }
 
-    // Email format validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return res.status(400).json({
@@ -46,7 +44,6 @@ const checkEmail = async (req, res) => {
   }
 };
 
-// ---------------- STEP 2: SIGN UP ----------------
 const signUp = async (req, res) => {
   try {
     console.log("STEP2 BODY:", req.body);
@@ -86,12 +83,9 @@ const signUp = async (req, res) => {
       password: hashed,
     });
 
-    // JWT
-    const accessToken = jwt.sign(
-      { _id: user._id },
-      process.env.JWT_SECRET,
-      { expiresIn: "15m" }
-    );
+    const accessToken = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "15m",
+    });
 
     const refreshToken = jwt.sign(
       { _id: user._id },
@@ -117,7 +111,6 @@ const signUp = async (req, res) => {
   }
 };
 
-// ---------------- SIGN IN ----------------
 const signIn = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -147,11 +140,9 @@ const signIn = async (req, res) => {
       });
     }
 
-    const accessToken = jwt.sign(
-      { _id: user._id },
-      process.env.JWT_SECRET,
-      { expiresIn: "15m" }
-    );
+    const accessToken = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "15m",
+    });
 
     const refreshToken = jwt.sign(
       { _id: user._id },
