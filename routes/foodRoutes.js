@@ -1,20 +1,18 @@
 const express = require("express");
 const Food = require("../schemas/foodSchema");
-const FoodCategory = require("../schemas/foodCategorySchema"); // ❗ заавал хэрэгтэй
+const FoodCategory = require("../schemas/foodCategorySchema");
 
 const router = express.Router();
 
-// ===================== GET FOODS =====================
 router.get("/", async (req, res) => {
   try {
-    const foods = await Food.find().populate("category"); // ❗ категорийн нэрийг populate
+    const foods = await Food.find().populate("category");
     res.send(foods);
   } catch (err) {
     res.status(500).send({ error: err.message });
   }
 });
 
-// ===================== GET ONE FOOD =====================
 router.get("/:id", async (req, res) => {
   try {
     const food = await Food.findById(req.params.id).populate("category");
@@ -25,12 +23,10 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-// ===================== CREATE FOOD =====================
 router.post("/", async (req, res) => {
   try {
     const newFood = await Food.create(req.body);
 
-    // ➕ Category дотор dishes-д ID-г push хийнэ
     await FoodCategory.findByIdAndUpdate(req.body.category, {
       $push: { dishes: newFood._id },
     });
@@ -41,7 +37,6 @@ router.post("/", async (req, res) => {
   }
 });
 
-// ===================== UPDATE =====================
 router.put("/:id", async (req, res) => {
   try {
     const updated = await Food.findByIdAndUpdate(req.params.id, req.body, {
@@ -53,7 +48,6 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-// ===================== DELETE =====================
 router.delete("/:id", async (req, res) => {
   try {
     await Food.findByIdAndDelete(req.params.id);

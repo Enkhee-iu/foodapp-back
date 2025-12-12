@@ -5,7 +5,7 @@ const router = express.Router();
 
 router.get("/", async (req, res) => {
   try {
-    const categories = await FoodCategory.find().populate("dishes"); // ⬅ хоосон биш болгох
+    const categories = await FoodCategory.find().populate("dishes");
     res.send(categories);
   } catch (err) {
     res.status(500).send({ error: err.message });
