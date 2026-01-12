@@ -1,21 +1,33 @@
 const express = require("express");
 const router = express.Router();
 const FoodOrder = require("../schemas/foodOrderSchema");
+const auth = require("../middlewares/auth");
 
 /* =========================
-   GET ALL ORDERS (ADMIN)
+   GET ALL ORDERS (ADMIN) OR USER ORDERS
 ========================= */
-router.get("/", async (req, res) => {
-  const { userId } = req.query;
+router.get("/", auth, async (req, res) => {
+  try {
+    const { userId } = req.query;
+    let filter = {};
 
-  let filter = {};
-  if (userId) filter.user = userId;
+    // If user is admin and requests specific user's orders, or just lists all
+    // But here we might want to restrict:
+    // If not admin, force filter by req.user.id
+    if (req.user.role !== "admin") {
+       filter.user = req.user.id;
+    } else if (userId) {
+       filter.user = userId;
+    }
 
-  const orders = await FoodOrder.find(filter)
-    .populate("foodOrderItems.food", "name price image")
-    .sort({ createdAt: -1 }); // ⭐ шинэ нь дээр
+    const orders = await FoodOrder.find(filter)
+      .populate("foodOrderItems.food", "name price image")
+      .sort({ createdAt: -1 }); // ⭐ шинэ нь дээр
 
-  res.json({ success: true, data: orders });
+    res.json({ success: true, data: orders });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
 });
 
 /* =========================
@@ -133,13 +145,6 @@ router.delete("/:id", async (req, res) => {
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
-});
-
-const auth = require("../middlewares/auth");
-
-router.get("/", auth, async (req, res) => {
-  const orders = await FoodOrder.find({ user: req.user.id });
-  res.json({ success: true, data: orders });
 });
 
 module.exports = router;
