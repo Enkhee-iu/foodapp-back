@@ -6,9 +6,9 @@ const router = express.Router();
 router.get("/", async (req, res) => {
   try {
     const categories = await FoodCategory.find().populate("dishes");
-    res.send(categories);
+    res.json(categories);
   } catch (err) {
-    res.status(500).send({ error: err.message });
+    res.status(500).json({ error: err.message });
   }
 });
 
@@ -17,21 +17,22 @@ router.get("/:id", async (req, res) => {
     const category = await FoodCategory.findById(req.params.id).populate(
       "dishes"
     );
-    res.send(category);
+    if (!category) return res.status(404).json({ error: "Category not found" });
+    res.json(category);
   } catch (err) {
-    res.status(404).send({ error: "Category not found" });
+    res.status(404).json({ error: "Category not found" });
   }
 });
 
 router.post("/", async (req, res) => {
   try {
     const category = await FoodCategory.create(req.body);
-    res.send({
+    res.status(201).json({
       message: "Food category created successfully",
       data: category,
     });
   } catch (err) {
-    res.status(400).send({ error: err.message });
+    res.status(400).json({ error: err.message });
   }
 });
 
@@ -42,9 +43,9 @@ router.put("/:id", async (req, res) => {
       req.body,
       { new: true }
     );
-    res.send(category);
+    res.json(category);
   } catch (err) {
-    res.status(400).send({ error: err.message });
+    res.status(400).json({ error: err.message });
   }
 });
 
@@ -55,9 +56,9 @@ router.patch("/:id", async (req, res) => {
       req.body,
       { new: true }
     );
-    res.send(category);
+    res.json(category);
   } catch (err) {
-    res.status(400).send({ error: err.message });
+    res.status(400).json({ error: err.message });
   }
 });
 
@@ -71,13 +72,13 @@ router.delete("/:id", async (req, res) => {
     // 2️⃣ Дараа нь категори устгана
     await FoodCategory.findByIdAndDelete(categoryId);
 
-    res.send({
+    res.json({
       message: "Category and related foods deleted successfully",
       categoryId,
     });
   } catch (err) {
     console.log("DELETE ERROR:", err);
-    res.status(400).send({ error: err.message });
+    res.status(400).json({ error: err.message });
   }
 });
 
